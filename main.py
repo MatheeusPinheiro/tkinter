@@ -86,6 +86,25 @@ def deletar_item_treeview():
 
 
 def alterar_item_treeview():
+
+    campos_faltando = []
+
+    if not campo_digitavel_id.get():
+        campos_faltando.append("ID")
+    
+    if not campo_digitavel_nome.get():
+        campos_faltando.append("Nome")
+
+    if not campo_digitavel_idade.get():
+        campos_faltando.append("Idade")
+
+    if not campo_digitavel_sexo.get():
+        campos_faltando.append("Sexo")
+
+    if campos_faltando:
+        messagebox.showerror('Erro', f'Por favor, preencha os campos: {", ".join(campos_faltando)}')
+        return
+    
     #pega a posição do item selecionado
     item_selecionado = tree_view_dados.selection()[0]
 
@@ -96,6 +115,10 @@ def alterar_item_treeview():
                                    str(campo_digitavel_idade.get()), 
                                    str(campo_digitavel_sexo.get())) 
                            )
+    
+    limpar_campos()
+    messagebox.showinfo('Sucesso', 'Dados alterados com sucesso')
+
 
 
 botao_adicionar = Button(text="Cadastrar", font="Arial 12", command=add_item_tree_view)
