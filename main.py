@@ -1,9 +1,12 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+import pandas as pd
 
+#Criando a janela
 janela = Tk()
 
+#Configurações de tamanho e titulo
 janela.geometry('950x350')
 janela.title('TreeView')
 
@@ -43,7 +46,6 @@ def limpar_campos():
     campo_digitavel_idade.delete(0, 'end')
     campo_digitavel_sexo.delete(0, 'end')
 
-
 def add_item_tree_view():
 
     campos_faltando = []
@@ -73,10 +75,8 @@ def add_item_tree_view():
 
     limpar_campos()
     messagebox.showinfo('Sucesso', 'Cadastro realizado com sucesso')
-  
-    
-
-
+    contar_numero_linhas()
+   
 def deletar_item_treeview():
     #pega o item selecionado
     itens_selecionado = tree_view_dados.selection()
@@ -84,6 +84,7 @@ def deletar_item_treeview():
     for item in itens_selecionado:
         tree_view_dados.delete(item)
 
+    contar_numero_linhas()
 
 def alterar_item_treeview():
 
@@ -120,17 +121,43 @@ def alterar_item_treeview():
     messagebox.showinfo('Sucesso', 'Dados alterados com sucesso')
 
 
+def exportar_para_excel():
+    
+    dados = []
 
-botao_adicionar = Button(text="Cadastrar", font="Arial 12", command=add_item_tree_view)
+    for numero_linhas in tree_view_dados.get_children():
+
+        linha = tree_view_dados.item(numero_linhas)['values']
+
+        dados.append(linha)
+
+    if len(dados) > 0:
+
+        #Crio um dataframe
+        dataframe = pd.DataFrame(dados)
+
+        #Informo o nome das colunas
+        dataframe.columns = ['ID', 'Nome', 'Idade', 'Sexo']
+
+        #Salvo o arquivo
+        dataframe.to_excel('dados_exportados.xlsx', index=False, sheet_name='Pessoas')
+        messagebox.showinfo('Exportação de dados', 'Dados exportados com sucesso')
+
+    else:
+        messagebox.showerror('Nenhum dado', 'Não existem dados para exportar')
+
+
+botao_adicionar = Button(text="Cadastrar", font="Arial 12", command=add_item_tree_view, foreground='white',  bg='black')
 botao_adicionar.grid(row=2, column=0, columnspan=2, sticky='NSEW')
 
-botao_deletar = Button(text="Deletar", font="Arial 12", command=deletar_item_treeview)
+botao_deletar = Button(text="Deletar", font="Arial 12", command=deletar_item_treeview, foreground='white',  bg='black')
 botao_deletar.grid(row=2, column=2, columnspan=2, sticky='NSEW')
 
-
-botao_alterar = Button(text="Aterar", font="Arial 12", command=alterar_item_treeview)
+botao_alterar = Button(text="Aterar", font="Arial 12", command=alterar_item_treeview, foreground='white',  bg='black')
 botao_alterar.grid(row=2, column=4, columnspan=2, sticky='NSEW')
 
+botao_exportar = Button(text="Exportar", font="Arial 12", command=exportar_para_excel, foreground='white',  bg='black')
+botao_exportar.grid(row=2, column=6, columnspan=2, sticky='NSEW')
 
 
 #theme_use - alt, classic default
@@ -171,5 +198,22 @@ tree_view_dados.insert("", "end", text="5", values=("5", "Douglas", 16, "Masculi
 
 #Adicionando o tree view na tela
 tree_view_dados.grid(row=3, column=0, columnspan=8, sticky='NSEW')
+
+#Criando o label que vai mostrar o total de linhas
+label_numero_linhas = Label(text="Linhas: ", font='Arial 12')
+label_numero_linhas.grid(row=4, column=0, sticky='NSEW') 
+
+def contar_numero_linhas(item = ""):
+    numero_de_linhas = 0
+
+    #Pega a tabela inteira
+    linhas = tree_view_dados.get_children(item)
+
+    for linha in linhas:
+        numero_de_linhas+= 1
+
+    label_numero_linhas.config(text = f"Linhas: {str(numero_de_linhas)}")
+
+contar_numero_linhas()
 
 janela.mainloop()
